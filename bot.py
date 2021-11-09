@@ -45,6 +45,7 @@ def handleChannel(channel):
     while run:
         for member in client.get_participants(channel):
             member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
+            print("searching..")
             if member_entity not in visited_members:
                 client.send_message(entity=member_entity, message=MESSAGE)
                 client(InviteToChannelRequest(client.get_entity(GROUP), [member_entity]))
