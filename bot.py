@@ -3,6 +3,7 @@ from telethon.sync import TelegramClient, events
 from telethon.tl.types import InputPeerUser, VideoSize
 from telethon.tl.functions.channels import InviteToChannelRequest
 import threading
+import asyncio
 
 ## CONSTANTS
 API_ID = 14910831
@@ -35,7 +36,7 @@ def addMembers():
         for member in client.get_participants(channel):
             visited_members.append(member)
 
-def handleChannel(channel):
+async def handleChannel(channel):
     visited_members = []
     run = True
     for member in client.get_participants(channel):
