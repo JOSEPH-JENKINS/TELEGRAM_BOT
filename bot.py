@@ -1,6 +1,8 @@
-from telethon.sync import TelegramClient
-from telethon.tl.types import InputPeerUser
+from telethon import functions, types
+from telethon.sync import TelegramClient, events
+from telethon.tl.types import InputPeerUser, VideoSize
 from telethon.tl.functions.channels import InviteToChannelRequest
+import threading
 
 ## CONSTANTS
 API_ID = 14910831
@@ -33,19 +35,25 @@ def addMembers():
         for member in client.get_participants(channel):
             visited_members.append(member)
 
+def handleChannel(channel):
+    visited_members = []
+    run = True
+    for member in client.get_participants(channel):
+        member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
+        visited_members.append(member_entity)
+    while run:
+        for member in client.get_participants(channel):
+            member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
+            if member_entity not in visited_members:
+                client.send_message(entity=member_entity, message=MESSAGE)
+                client(InviteToChannelRequest(client.get_entity(GROUP), [member_entity]))
+                print("Sent Invite!")
+                visited_members.append(member_entity)
+
 def sendMessages():
     for channel in channels:
-        for member in client.get_participants(channel):
-            if member not in visited_members:
-                member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
-                try:
-                    client.send_message(entity=member_entity, message=MESSAGE)
-                    client(InviteToChannelRequest(client.get_entity(GROUP), [member_entity]))
-                    print("Sent Invite !")
-                except Exception:
-                    pass
+        channel_thread = threading.Thread(target=handleChannel,args=(channel, ))
+        channel_thread.start()
 
 loadChannels()
-addMembers()
-while True:
-    sendMessages()
+sendMessages()
