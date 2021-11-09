@@ -21,28 +21,31 @@ client.connect()
 if not client.is_user_authorized():
     client.send_code_request(TELEPHONE_NUMBER)
     client.sign_in(TELEPHONE_NUMBER, input("Enter Login Code: "))
+    print("connected")
     
 def loadChannels():
     for channel in client.get_dialogs():
         if channel.is_channel:
             channels.append(channel.entity)
-    print(channels)
+
+def addMembers():
+    for channel in channels:
+        for member in client.get_participants(channel):
+            visited_members.append(member)
 
 def sendMessages():
     for channel in channels:
         for member in client.get_participants(channel):
-            if member in visited_members:
-                continue
-            member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
-            try:
-                client.send_message(entity=member_entity, message=MESSAGE)
-                client(InviteToChannelRequest(client.get_entity(GROUP), [member_entity]))
-                print("Sent Invite !")
-            except Exception:
-                pass
+            if member not in visited_members:
+                member_entity = client.get_entity(InputPeerUser(member.id, member.access_hash))
+                try:
+                    client.send_message(entity=member_entity, message=MESSAGE)
+                    client(InviteToChannelRequest(client.get_entity(GROUP), [member_entity]))
+                    print("Sent Invite !")
+                except Exception:
+                    pass
 
-            visited_members.append(member)
-
+loadChannels()
+addMembers()
 while True:
-    loadChannels()
     sendMessages()
