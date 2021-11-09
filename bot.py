@@ -36,7 +36,7 @@ def addMembers():
         for member in client.get_participants(channel):
             visited_members.append(member)
 
-async def handleChannel(channel):
+def handleChannel(channel):
     visited_members = []
     run = True
     for member in client.get_participants(channel):
