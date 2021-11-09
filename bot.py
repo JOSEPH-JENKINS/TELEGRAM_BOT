@@ -43,5 +43,6 @@ def sendMessages():
 
             visited_members.append(member)
 
-loadChannels()
-sendMessages()
+while True:
+    loadChannels()
+    sendMessages()
