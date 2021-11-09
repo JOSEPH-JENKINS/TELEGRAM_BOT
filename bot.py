@@ -53,8 +53,7 @@ def handleChannel(channel):
 
 def sendMessages():
     for channel in channels:
-        channel_thread = threading.Thread(target=handleChannel,args=(channel, ))
-        channel_thread.start()
+        handleChannel(channel)
 
 loadChannels()
 sendMessages()
